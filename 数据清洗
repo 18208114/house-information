@@ -1,0 +1,40 @@
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import re
+df = pd.read_csv(r'C:\Users\10126\Desktop\链家_house_price.csv',encoding='utf-8')
+#print(df)
+repeat=df[df.duplicated()] #查看重复的行
+#print(repeat)
+df=df.drop_duplicates(subset=None, keep='first', inplace=False)#删除重复项并保留第一次出现的项
+#print(df)
+#print(df.isnull().sum()) #查看各个标题的缺失情况
+#print(df.describe())
+#print(df['房子价格']) #查看房子价格中的所有值
+def revise(data):
+    pattern = re.compile(r'[^0-9]')
+    price2 = re.sub(pattern, '',data)
+    return price2
+df['房子价格']=df['房子价格'].apply(revise)
+#print(df['房子价格'])
+#修改某一列中的数值，此为去掉房价中无关文字，只保留价格
+df['房子价格']=df['房子价格'].astype('int') #转换变量类型
+#print(sns.boxplot(data=df['房子价格']))
+#print(df['房子价格'].describe()) #查看房价信息从中获取有关'不合理'的房价
+#print(df[df['房子价格']<5000 & df['房子价格']>25000])
+#print(df[(df['房子价格'] < 5000) | (df['房子价格'] >25000)])   #爬取不合理的房价信息
+
+
+newdf=df[(df['房子价格']>5000)&(df['房子价格']<25000)]
+#print(newdf)
+#print(newdf.reset_index(drop=True))
+
+newdf = newdf.copy().sort_values(by = '房子地址')#按房子名称相同的进行分类
+newdf2=newdf.drop_duplicates(['房子地址'], keep='first',inplace=False)#删除重复项并保留第一次出现的项
+#print(newdf2)
+#print(newdf2['房子地址']) #获取房子地址
+newdf.to_csv('lianjia_house_price_information.csv', index=False)
+#newdf2.to_csv('lianjia1_house_price_information.csv', index=False)
+#newdf2['房子地址'].to_csv('lianjia1_house_position.csv', index=False)
+
+
